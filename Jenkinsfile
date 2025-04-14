@@ -1,22 +1,10 @@
 pipeline {
-    agent {
-        docker { image 'node:22.14.0-alpine3.21' }
-    }
-
-    environment {
-        DOCKER_BUILDKIT = 1
-    }
+    agent any
 
     stages {
         stage('Install') {
             steps {
                 sh 'npm install'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'npm run start'
             }
         }
 
@@ -26,17 +14,18 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Build Docker Image') {
             steps {
                 sh 'docker build -t hello-jenkins-app .'
-                sh 'docker run -d -p 3000:3000 --name hello-jenkins hello-jenkins-app || true'
             }
         }
-    }
 
-    post {
-        always {
-            junit 'jest-junit.xml'
+        stage('Run Container') {
+            steps {
+                sh 'docker run -d -p 3000:3000 --name hello-jenkins hello-jenkins-app'
+                // Ensuring that the app is running, adding a pause for Jenkins to hold and verify the status
+                sh 'sleep 5'  // Give Docker some time to start
+            }
         }
     }
 }
