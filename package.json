@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "start": "node index.js",
-    "test": "node test/test.js"
+    "test": "jest"
   },
-  "dependencies": {}
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
 }
-
